@@ -8,6 +8,8 @@ from texnomart_uz.models import Product, Category, Key
 from texnomart_uz.serializers import ProductSerializer, CategorySerializer, KeySerializer, ValueSerializer
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 # Create your views here.
@@ -16,6 +18,10 @@ class ProductListView(generics.ListAPIView):
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAdminUser, permissions.IsAuthenticated]
     authentication_classes = [JWTAuthentication]  # authentication.TokenAuthentication
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+
+    filterset_fields = ['category', 'price', 'is_liked']
+    search_fields = ['name', 'description']
 
     @method_decorator(cache_page(60 * 3))
     def get(self, *args, **kwargs):
